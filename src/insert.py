@@ -49,7 +49,7 @@ def insert(df, db_path, db_table):
     Args:
         df (pd.DataFrame): A preped dataframe that will be inserted to the database.
         df_path (str): The SQLite database.
-        df_table (str): Specified table within datbase.
+        df_table (str): Specified table within database.
     """
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
