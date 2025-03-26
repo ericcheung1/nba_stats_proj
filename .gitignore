@@ -1,0 +1,4 @@
+*.db
+test_db.py
+test.py
+__pycache__
