@@ -1,22 +1,15 @@
 import sys
 import os
-
-# Check if __file__ is defined (running from a file)
-try:
-    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-except NameError:
-    # If __file__ is not defined (running in REPL or code cell), use os.getcwd()
-    project_root = os.getcwd()
-
-sys.path.append(project_root)
-
-from src.get_db_path import get_db_path
 import pandas as pd
 import numpy as np
 import sqlite3
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(project_root)
+from src.get_db_path import get_db_path
 
 db_path = get_db_path('nba_stats.db')
-merge_list = ['player', 'player_id','G', 'GS', 'Age', 'Pos', 'Team', 'season']
+seasons = ['2020-21', '2021-22', '2022-23', '2023-24'] # list of seasons to query from database
+test_season = 'season_2023-24' # format as "season_" + Test Season
 
 def get_data(db_path, season):
 
@@ -40,20 +33,30 @@ def get_data(db_path, season):
     Advanced = pd.read_sql(AD24, conn)
     conn.close()
 
+    merge_list = ['player', 'player_id','G', 'GS', 'Age', 'Pos', 'Team', 'season']
     Advanced['player_id'] = Advanced['player_id'].apply(pd.to_numeric, errors='coerce').astype('Int64')
     return pd.merge(PerGame, Advanced, how='left', on=merge_list)
 
-_2021_22 = get_data(db_path, '2021-22')
-_2022_23 = get_data(db_path, '2022-23')
-_2023_24 = get_data(db_path, '2023-24')
+list_of_seasons = []
+for season in seasons:
+    data = get_data(db_path, season)
+    list_of_seasons.append(data)
+full_data = pd.concat(list_of_seasons)
 
-data = pd.concat([_2021_22, _2022_23, _2023_24])
-Salary_caps = {'2021-22': 112414000,'2022-23': 123655000,'2023-24': 136021000}
-data['Salary_cap'] = data['season'].apply(lambda x: Salary_caps.get(x))
-data['Cap_Pct'] = np.round((data['Salary']/data['Salary_cap']), 2)
-data.dropna(inplace=True)
+Salary_caps = pd.read_csv(os.path.join(project_root, 'data', 'cap_hist.csv'))
+cap_dict = Salary_caps.set_index('season')['Salary_cap'].to_dict()
 
-# PerGame['Salary_Cap'] = 136021000
-# PerGame['Cap_Pct'] = np.round((PerGame['Salary']/PerGame['Salary_Cap'])*100, 2)
-# PerGame.dropna(inplace=True)
-# print(PerGame)
+full_data['Salary_cap'] = full_data['season'].apply(lambda x: cap_dict.get(x))
+full_data['Cap_Pct'] = np.round((full_data['Salary']/full_data['Salary_cap']), 2)
+full_data.dropna(inplace=True)
+
+full_data.sort_values(['season', 'player_id'], inplace=True)
+full_data_wd = pd.get_dummies(full_data, columns=['Pos', 'season', 'Team'], drop_first=True, dtype=int)
+train_data_wd = full_data_wd.loc[full_data_wd[test_season] == 0]
+test_data_wd = full_data_wd.loc[full_data_wd[test_season] == 1]
+
+full_data_wd.to_csv(os.path.join(project_root, 'data', 'full_data.csv'), index=False)
+print(f"Matching Columns: {sum(test_data_wd.columns == train_data_wd.columns)}")
+print(f"Full Data Shape: {full_data_wd.shape}")
+print(f"Train Data Shape: {train_data_wd.shape}")
+print(f"Test Data Shape: {test_data_wd.shape}")
