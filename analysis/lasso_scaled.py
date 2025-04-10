@@ -7,6 +7,9 @@ from sklearn.linear_model import Lasso
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 
+print(f"Lasso Regression with Scaled Features")
+print(f"")
+
 # loading data
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 full_data = pd.read_csv(os.path.join(project_root, 'data', 'full_data.csv'))
@@ -70,10 +73,12 @@ for alpha in alphas_to_test: # loop through each alpha to be tested
         best_averaged_MAE = averaged_MAE 
         best_alpha = alpha
 
+print(f"Model Evaluation Metrics:")
 print(f"Best alpha through time series cv is: {best_alpha:.6f}")
 print(f"Best MAE found through time series: {best_averaged_MAE:.6f}")
+print(f"")
 
-# fitting model on full data
+# fitting model on full data and predicting on unseen data
 scaler = StandardScaler()
 X_num = X[numerical_cols]
 X_scaled = scaler.fit_transform(X_num)
@@ -81,6 +86,15 @@ X_scaled_df = pd.DataFrame(X_scaled, index=X.index, columns=X_num.columns)
 X_processed = pd.concat([X_scaled_df, X.drop(columns=numerical_cols, axis=1)], axis=1)
 
 Lasso_reg = Lasso(alpha=0.0011787686347935866, random_state=32, max_iter=25000).fit(X_processed, Y)
+new_X_num = new_X[numerical_cols]
+new_X_scaled = scaler.transform(new_X_num)
+new_X_scaled_df = pd.DataFrame(new_X_scaled, index=new_X.index, columns=new_X_num.columns)
+new_X_processed = pd.concat([new_X_scaled_df, new_X.drop(columns=numerical_cols, axis=1)], axis=1)
+new_pred = Lasso_reg.predict(new_X_processed)
+print(f"Scores for Prediction on 2023-24 Data:")
+print(f"MAE: {mean_absolute_error(new_Y, new_pred):.5f}") # 0.03401
+print(f"MSE: {mean_squared_error(new_Y, new_pred):.5f}") # 0.00211
+print(f"")
 feature_names = X.columns
 coefficients = Lasso_reg.coef_
 coef_dict = dict(zip(feature_names, coefficients))
@@ -89,13 +103,15 @@ coef_dict = dict(zip(feature_names, coefficients))
 #     print(f"{feature}: {coefficient:.4f}")
 
 model_filename = 'scaled_lasso_model.joblib'
-joblib.dump(Lasso_reg, os.path.join(project_root, 'models', model_filename))
+# joblib.dump(Lasso_reg, os.path.join(project_root, 'models', model_filename))
 
-# predicting on new unseen data
-new_X_num = new_X[numerical_cols]
-new_X_scaled = scaler.transform(new_X_num)
-new_X_scaled_df = pd.DataFrame(new_X_scaled, index=new_X.index, columns=new_X_num.columns)
-new_X_processed = pd.concat([new_X_scaled_df, new_X.drop(columns=numerical_cols, axis=1)], axis=1)
-new_pred = Lasso_reg.predict(new_X_processed)
-print(f"MAE: {mean_absolute_error(new_Y, new_pred):.5f}")
-print(f"MSE: {mean_squared_error(new_Y, new_pred):.5f}")
+# final predictions on new unseen data
+new_pred_series = pd.Series(new_pred)
+test_data_copy = test_data.copy()
+test_data_copy.reset_index(inplace=True)
+test_data_copy['Predicted_Cap_Pct'] = np.round(new_pred_series, 4)
+test_data_copy['Predicted_Salary'] = np.round(test_data_copy['Predicted_Cap_Pct']*test_data_copy['Salary_cap'], 0)
+final_preds = test_data_copy[['player', 'Cap_Pct', 'Predicted_Cap_Pct', 'Salary', 'Predicted_Salary']].copy()
+final_preds[['Salary', 'Predicted_Salary']] = final_preds[['Salary', 'Predicted_Salary']].map(lambda x: f"${x:,.0f}")
+print(f"Salary Predictions:")
+print(f"{final_preds.sample(5)}")
