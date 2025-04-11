@@ -4,15 +4,23 @@ import numpy as np
 import joblib
 from sklearn.model_selection import TimeSeriesSplit
 from sklearn.linear_model import Lasso
-from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 
-print(f"Lasso Regression with Unscaled Features")
+print(f"Lasso Regression with Unscaled Features and Rookie Scale Contract Feature")
 print(f"")
 
-# loading data
+# loading data 
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 full_data = pd.read_csv(os.path.join(project_root, 'data', 'full_data.csv'))
+
+def rookie_scale(age):
+    experience = age - 20
+    if 1 <= experience <= 4:
+        return 1
+    else:
+        return 0 
+
+full_data['rookie_scale'] = full_data['Age'].apply(rookie_scale)
 test_season = 'season_2023-24'
 train_data = full_data.loc[full_data[test_season] == 0]
 test_data = full_data.loc[full_data[test_season] == 1]
@@ -65,17 +73,21 @@ print(f"")
 Lasso_reg = Lasso(alpha=0.0011787686347935866, random_state=32, max_iter=25000).fit(X, Y)
 new_pred = Lasso_reg.predict(new_X)
 print(f"Scores for Prediction on 2023-24 Data:")
-print(f"MAE: {mean_absolute_error(new_Y, new_pred):.5f}") # 0.03363
-print(f"MSE: {mean_squared_error(new_Y, new_pred):.5f}") # 0.00209
+print(f"MAE: {mean_absolute_error(new_Y, new_pred):.5f}") 
+print(f"MSE: {mean_squared_error(new_Y, new_pred):.5f}") 
 print(f"")
 feature_names = X.columns
 coefficients = Lasso_reg.coef_
 coef_dict = dict(zip(feature_names, coefficients))
 
-# for feature, coefficient in coef_dict.items():
-#     print(f"{feature}: {coefficient:.4f}")
+non_zero = []
+for feature, coefficient in coef_dict.items():
+    if coefficient != 0.0000 or coefficient != -0.0000:
+        non_zero.append(feature)
+        #print(f"{feature}: {coefficient:.4f}")
+print(f"Non-zero features: {non_zero} Number: {len(non_zero)}")
 
-model_filename = 'unscaled_lasso_model.joblib'
+model_filename = 'unscaled_lasso_model_with_rookie.joblib'
 # joblib.dump(Lasso_reg, os.path.join(project_root, 'models', model_filename))
 
 # final predictions on unseen data
@@ -88,5 +100,3 @@ final_preds = test_data_copy[['player', 'Cap_Pct', 'Predicted_Cap_Pct', 'Salary'
 final_preds[['Salary', 'Predicted_Salary']] = final_preds[['Salary', 'Predicted_Salary']].map(lambda x: f"${x:,.0f}")
 print(f"Salary Predictions:")
 print(f"{final_preds.sample(5)}")
-
-
