@@ -1,13 +1,6 @@
 import sys
 import os
-
-# Check if __file__ is defined (running from a file)
-try:
-    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-except NameError:
-    # If __file__ is not defined (running in REPL or code cell), use os.getcwd()
-    project_root = os.getcwd()
-
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(project_root)
 from src.scraper2 import scrape_page
 from src.cleaner import clean_bbref, clean_salary, salary_match
@@ -15,9 +8,9 @@ from src.insert import insert_prep, insert
 from src.get_db_path import get_db_path
 import pandas as pd
 
-Per_Game_Page = 'https://www.basketball-reference.com/leagues/NBA_2021_per_game.html'
-Advanced_Page = 'https://www.basketball-reference.com/leagues/NBA_2021_advanced.html'
-Salary_Page = 'https://hoopshype.com/salaries/players/2020-2021/'
+Per_Game_Page = 'https://www.basketball-reference.com/leagues/NBA_2019_per_game.html'
+Advanced_Page = 'https://www.basketball-reference.com/leagues/NBA_2019_advanced.html'
+Salary_Page = 'https://hoopshype.com/salaries/players/2018-2019/'
 Database_name = 'nba_stats.db'
 
 def pipeline(url1, url2, url3, db_name):

@@ -73,8 +73,8 @@ print(f"")
 Lasso_reg = Lasso(alpha=0.0011787686347935866, random_state=32, max_iter=25000).fit(X, Y)
 new_pred = Lasso_reg.predict(new_X)
 print(f"Scores for Prediction on 2023-24 Data:")
-print(f"MAE: {mean_absolute_error(new_Y, new_pred):.5f}") 
-print(f"MSE: {mean_squared_error(new_Y, new_pred):.5f}") 
+print(f"MAE: {mean_absolute_error(new_Y, new_pred):.5f}") # 0.03351
+print(f"MSE: {mean_squared_error(new_Y, new_pred):.5f}") # 0.00207
 print(f"")
 feature_names = X.columns
 coefficients = Lasso_reg.coef_
@@ -86,6 +86,7 @@ for feature, coefficient in coef_dict.items():
         non_zero.append(feature)
         #print(f"{feature}: {coefficient:.4f}")
 print(f"Non-zero features: {non_zero} Number: {len(non_zero)}")
+print(f"")
 
 model_filename = 'unscaled_lasso_model_with_rookie.joblib'
 # joblib.dump(Lasso_reg, os.path.join(project_root, 'models', model_filename))
@@ -100,3 +101,4 @@ final_preds = test_data_copy[['player', 'Cap_Pct', 'Predicted_Cap_Pct', 'Salary'
 final_preds[['Salary', 'Predicted_Salary']] = final_preds[['Salary', 'Predicted_Salary']].map(lambda x: f"${x:,.0f}")
 print(f"Salary Predictions:")
 print(f"{final_preds.sample(5)}")
+

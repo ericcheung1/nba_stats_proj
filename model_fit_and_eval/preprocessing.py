@@ -8,7 +8,7 @@ sys.path.append(project_root)
 from src.get_db_path import get_db_path
 
 db_path = get_db_path('nba_stats.db')
-seasons = ['2020-21', '2021-22', '2022-23', '2023-24'] # list of seasons to query from database
+seasons = ['2018-19', '2019-20', '2020-21', '2021-22', '2022-23', '2023-24'] # list of seasons to query from database
 test_season = 'season_2023-24' # format as "season_" + Test Season
 
 def get_data(db_path, season):
@@ -55,7 +55,7 @@ full_data_wd = pd.get_dummies(full_data, columns=['Pos', 'season', 'Team'], drop
 train_data_wd = full_data_wd.loc[full_data_wd[test_season] == 0]
 test_data_wd = full_data_wd.loc[full_data_wd[test_season] == 1]
 
-full_data_wd.to_csv(os.path.join(project_root, 'data', 'full_data.csv'), index=False)
+full_data_wd.to_csv(os.path.join(project_root, 'data', 'full_data_six_seasons.csv'), index=False)
 print(f"Matching Columns: {sum(test_data_wd.columns == train_data_wd.columns)}")
 print(f"Full Data Shape: {full_data_wd.shape}")
 print(f"Train Data Shape: {train_data_wd.shape}")

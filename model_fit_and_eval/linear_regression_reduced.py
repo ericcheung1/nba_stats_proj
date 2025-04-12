@@ -68,7 +68,7 @@ feature_names = X.columns
 coefficients = Lin_reg.coef_
 coef_dict = dict(zip(feature_names, coefficients))
 
-model_filename = 'lin_reg_variable_selected_model.joblib'
+model_filename = 'linear_regression_reduced.joblib'
 # joblib.dump(Lin_reg, os.path.join(project_root, 'models', model_filename))
 
 # final predictions on unseen data

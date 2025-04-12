@@ -20,7 +20,7 @@ def scrape_page(url):
     response.encoding = 'uft-8'
 
     # parsing table
-    page_soup = Soup(response.text) # parsing page
+    page_soup = Soup(response.text, features='html.parser') # parsing page
     table = page_soup.find_all('table') # parsing all tables
     rows = table[0].find_all('tr') # parsing all rows from first table
     
