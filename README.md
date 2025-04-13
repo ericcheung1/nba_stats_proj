@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-This project aims to predict the salary cap percentage of NBA players for the 2023-24 season based on historical data and player statistics. The pipeline includes data loading, feature engineering, model selection, training, and evaluation. Different machine learning models from regression-based to tree-based were explored and compared to find the most accurate predictors and models. Data collected from 'https://www.basketball-reference.com/' and 'https://hoopshype.com/'.
+This project aims to predict the salary of NBA players, represented as a percentage of the season's salary cap for the 2023-24 season, based on historical player statistics. The target variable, Salary Cap percentage, normalizes for the increasing Salary Cap and player salaries. The pipeline includes data collection via web scraping from 'https://www.basketball-reference.com/' and 'https://hoopshype.com/', data cleaning, data storage using SQLite, database design, data loading, feature selection and engineering, model selection, training, and evaluation. Different machine learning models, ranging from regression-based to tree-based algorithms, were explored and compared to identify the models with the lowest prediction error as measured by the metric Mean Absolute Error (MAE) and Mean Squared Error (MSE).
 
 ## Data
 
