@@ -4,3 +4,4 @@ test.py
 *.joblib
 __pycache__
 notebook.txt
+compare.ipynb
