@@ -6,7 +6,7 @@ This project aims to predict the salary of NBA players, represented as a percent
 
 ## Data
 
-The primary dataset used for this project is `full_data.csv`, located in the `data/` directory. This file contains historical NBA player statistics and salary information, spanning from the 2020-21 through 2022-23 NBA seasons. One model was trained on an expanded dataset containing data spanning the 2018-19 through 2022-23 NBA seasons contained in the `fu_data_six_seasons.csv` file. The data was collected using the `data_pipeline.py` file in the `data/` directory and preprocessed using the `preprocessing.py ` file in the `model_fit_and_eval/` directory. Functions and code used to collect and clean data including the `scraper2.py` and `cleaner.py` files can be found in `src/` directory. And the `database.py` file in the `data/` directory can be used to recreate the SQLite database used to store the collected data.
+The primary dataset used for this project is `full_data.csv`, located in the `data/` directory. This file contains historical NBA player statistics and salary information, spanning from the 2020-21 through 2022-23 NBA seasons. One model was trained on an expanded dataset containing data spanning the 2018-19 through 2022-23 NBA seasons contained in the `full_data_six_seasons.csv` file. The data was collected using the `data_pipeline.py` file in the `data/` directory and preprocessed using the `preprocessing.py ` file in the `model_fit_and_eval/` directory. Functions and code used to collect and clean data including the `scraper2.py` and `cleaner.py` files can be found in `src/` directory. And the `database.py` file in the `data/` directory can be used to recreate the SQLite database used to store the collected data.
 
 ## Feature Engineering
 
